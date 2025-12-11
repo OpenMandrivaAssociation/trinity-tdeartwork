@@ -1,6 +1,9 @@
-#
-# Please submit bugfixes or comments via http://www.trinitydesktop.org/
-#
+%bcond clang 1
+%bcond esound 0
+%bcond libart 1
+%bcond xscreensaver 1
+%bcond jack 1
+%bcond gamin 1
 
 # BUILD WARNING:
 #  Remove qt-devel and qt3-devel and any kde*-devel on your system !
@@ -11,6 +14,8 @@
 %if "%{?tde_version}" == ""
 %define tde_version 14.1.5
 %endif
+%define pkg_rel 2
+
 %define tde_pkg tdeartwork
 %define tde_prefix /opt/trinity
 %define tde_bindir %{tde_prefix}/bin
@@ -25,31 +30,24 @@
 %define tde_tdeincludedir %{tde_includedir}/tde
 %define tde_tdelibdir %{tde_libdir}/trinity
 
-%if 0%{?mdkversion}
 %undefine __brp_remove_la_files
 %define dont_remove_libtool_files 1
 %define _disable_rebuild_configure 1
-%endif
 
 # fixes error: Empty %files file …/debugsourcefiles.list
 %define _debugsource_template %{nil}
 
 %define tarball_name %{tde_pkg}-trinity
-%global toolchain %(readlink /usr/bin/cc)
 
 
 Name:		trinity-%{tde_pkg}
 Summary:	Additional artwork (themes, sound themes, ...) for TDE
 Version:	%{tde_version}
-Release:	%{?!preversion:1}%{?preversion:0_%{preversion}}%{?dist}
+Release:	%{?!preversion:%{pkg_rel}}%{?preversion:0_%{preversion}}%{?dist}
 Group:		System/GUI/Other
 URL:		http://www.trinitydesktop.org/
 
-%if 0%{?suse_version}
-License:	GPL-2.0+
-%else
 License:	GPLv2+
-%endif
 
 #Vendor:		Trinity Desktop
 #Packager:	Francois Andriot <francois.andriot@free.fr>
@@ -58,7 +56,21 @@ Prefix:		%{tde_prefix}
 
 Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/core/%{tarball_name}-%{version}%{?preversion:~%{preversion}}.tar.xz
 
-BuildRequires:  cmake make
+BuildSystem:    cmake
+BuildOption:    -DCMAKE_BUILD_TYPE="RelWithDebInfo"
+BuildOption:    -DCMAKE_SKIP_RPATH=OFF
+BuildOption:    -DCMAKE_SKIP_INSTALL_RPATH=OFF
+BuildOption:    -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
+BuildOption:    -DCMAKE_INSTALL_RPATH="%{tde_libdir}"
+BuildOption:    -DBIN_INSTALL_DIR=%{tde_bindir}
+BuildOption:    -DINCLUDE_INSTALL_DIR=%{tde_tdeincludedir}
+BuildOption:    -DLIB_INSTALL_DIR=%{tde_libdir}
+BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_datadir}
+BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_datadir}
+BuildOption:    -DWITH_ALL_OPTIONS=ON -DWITH_ARTS=ON
+BuildOption:    -DWITH_LIBART=ON -DWITH_OPENGL=ON -DBUILD_ALL=ON
+%{!?with_xscreensaver:BuildOption:    -DWITH_XSCREENSAVER=OFF}
+%{!?with_libart:BuildOption:    -DWITH_LIBART=OFF}
 
 Obsoletes:	trinity-kdeartwork < %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:	trinity-kdeartwork = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -68,9 +80,9 @@ BuildRequires:	trinity-tdelibs-devel >= %{tde_version}
 BuildRequires:	trinity-tdebase-devel >= %{tde_version}
 
 BuildRequires:	trinity-tde-cmake >= %{tde_version}
-%if "%{?toolchain}" != "clang"
-BuildRequires:	gcc-c++
-%endif
+
+%{!?with_clang:BuildRequires:	gcc-c++}
+
 BuildRequires:	fdupes
 
 BuildRequires:	gettext
@@ -78,8 +90,7 @@ BuildRequires:	gettext
 BuildRequires:	pkgconfig(libidn)
 
 # ESOUND support
-#BuildRequires:	esound-devel
-# BuildRequires:  pkgconfig(esound)
+%{?with_esound:BuildRequires:  pkgconfig(esound)}
 
 # ACL support
 BuildRequires:  pkgconfig(libacl)
@@ -88,66 +99,22 @@ BuildRequires:  pkgconfig(libacl)
 BuildRequires:  pkgconfig(glu)
 
 # LIBART support
-%define with_libart 1
-BuildRequires:	pkgconfig(libart-2.0)
+%{?with_libart:BuildRequires:	pkgconfig(libart-2.0)}
 
 # XSCREENSAVER support
-#  RHEL 4: disabled
-#  RHEL 6: available in EPEL
-#  RHEL 7: available in NUX
-#  RHEL 8: available in EPEL
-#  RHEL 9: available in EPEL
-%if 0%{?fedora} || 0%{?mgaversion} || 0%{?mdkversion} || 0%{?rhel} >= 5 || 0%{?suse_version}
-%define with_xscreensaver 1
-
-%if 0%{?fedora} || 0%{?rhel} >= 5
 BuildRequires:	xscreensaver
 BuildRequires:	xscreensaver-base
-BuildRequires:	xscreensaver-extras
-%if 0%{?fedora}
-BuildRequires:	xscreensaver-extras-base
-%endif
-BuildRequires:	xscreensaver-gl-base
-BuildRequires:	xscreensaver-gl-extras
-%endif
-
-%if 0%{?suse_version}
-BuildRequires:	xscreensaver
-BuildRequires:	xscreensaver-data
-BuildRequires:	xscreensaver-data-extra
-%endif
-
-%if 0%{?mgaversion} || 0%{?mdkversion}
-BuildRequires:	xscreensaver
-BuildRequires:	xscreensaver-base
-%if 0%{?pclinuxos} == 0
-BuildRequires:	xscreensaver-extrusion
-%endif
 BuildRequires:	xscreensaver-gl
-
 BuildRequires:  pkgconfig(xscrnsaver)
-%endif
 
 BuildRequires:  pkgconfig(xrender)
 
 
-# Opensuse <= 13.10 does not provide 'webcollage' screensaver
-%if 0%{?suse_version} == 0 || 0%{?suse_version} >= 1320
-%define with_webcollage 1
-%endif
-
-%endif
-
 # JACK support
-%define with_jack 1
-BuildRequires:	pkgconfig(jack)
+%{?with_jack:BuildRequires:	pkgconfig(jack)}
 
 # GAMIN support
-#  Not on openSUSE.
-%if 0%{?!suse_version}
-%define with_gamin 1
-BuildRequires:	pkgconfig(gamin)
-%endif
+%{?with_gamin:BuildRequires:	pkgconfig(gamin)}
 
 # OPENSSL support
 BuildRequires:	pkgconfig(openssl)
@@ -162,12 +129,9 @@ Requires: %{name}-theme-window = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires: trinity-tdewallpapers = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires: trinity-tdescreensaver = %{?epoch:%{epoch}:}%{version}-%{release}
 
-%if 0%{?with_xscreensaver}
+%if %{with xscreensaver}
 Requires: trinity-tdescreensaver-xsavers = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires: trinity-tdescreensaver-xsavers-extra = %{?epoch:%{epoch}:}%{version}-%{release}
-%if 0%{?with_webcollage}
-Requires: trinity-tdescreensaver-xsavers-webcollage = %{?epoch:%{epoch}:}%{version}-%{release}
-%endif
 %endif
 
 
@@ -385,7 +349,7 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %{tde_mandir}/man1/tdeasciiquarium.kss.1
 %{tde_mandir}/man1/tdepartsaver.kss.1
 
-%if 0%{?with_xscreensaver}
+%if %{with xscreensaver}
 %{tde_bindir}/kspace.kss
 %{tde_bindir}/kswarm.kss
 %{tde_datadir}/applnk/System/ScreenSavers/KSpace.desktop
@@ -396,7 +360,7 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 ##########
 
-%if 0%{?with_xscreensaver}
+%if %{with xscreensaver}
 
 %package -n trinity-tdescreensaver-xsavers
 Summary:	Trinity hooks for standard xscreensavers
@@ -487,71 +451,13 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %{tde_datadir}/applnk/System/ScreenSavers/cwaves.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/topblock.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/voronoi.desktop
-%if 0%{?rhel} >= 6 || 0%{?fedora} || 0%{?mgaversion} || 0%{?mdkversion} || 0%{?suse_version}
 %{tde_datadir}/applnk/System/ScreenSavers/cubicgrid.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/hypnowheel.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/lcdscrub.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/photopile.desktop
 %{tde_datadir}/applnk/System/ScreenSavers/skytentacles.desktop
-%endif
-%if 0%{?rhel} == 5
-%{tde_datadir}/applnk/System/ScreenSavers/bubbles.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/critical.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/flag.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/forest.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glforestfire.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/hyperball.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/hypercube.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/juggle.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/laser.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lightning.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lisa.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lissie.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lmorph.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/mismunch.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/rotor.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/sphere.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/spiral.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/t3d.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/vines.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/whirlygig.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/worm.desktop
-%endif
 %{tde_mandir}/man1/kxsconfig.1
 %{tde_mandir}/man1/kxsrun.1
-
-%endif
-
-##########
-
-%if 0%{?with_webcollage}
-
-%package -n trinity-tdescreensaver-xsavers-webcollage
-Summary:	Webcollage screensaver Trinity hook
-Group:		System/GUI/Other
-Requires:	trinity-tdescreensaver-xsavers-extra = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:	netpbm
-
-Obsoletes:	trinity-kscreensaver-xsavers-webcollage < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kscreensaver-xsavers-webcollage = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description -n trinity-tdescreensaver-xsavers-webcollage
-This package give access to the webcollage screensaver through the Trinity
-screensaver configuration.
-
-This screensaver downloads random pictures from the internet and creates
-a collage as screensaver.
-
-IMPORTANT NOTICE: The internet contains all kinds of pictures, some of which
-you might find inappropriate and offensive.
-You are specially discouraged to install this package if you are using 
-your computer in a working environment or in an environment with children.
-
-This package is part of Trinity, and a component of the TDE artwork module.
-
-%files -n trinity-tdescreensaver-xsavers-webcollage
-%defattr(-,root,root,-)
-%{tde_datadir}/applnk/System/ScreenSavers/webcollage.desktop
 
 %endif
 
@@ -640,37 +546,11 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/cwaves.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/topblock.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/voronoi.desktop
-%if 0%{?rhel} >= 6 || 0%{?fedora} || 0%{?mgaversion} || 0%{?mdkversion} || 0%{?suse_version}
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/cubicgrid.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/hypnowheel.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/lcdscrub.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/photopile.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/skytentacles.desktop
-%endif
-%if 0%{?rhel} == 5
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/bubbles.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/critical.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/flag.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/forest.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glforestfire.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/hyperball.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/hypercube.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/juggle.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/laser.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lightning.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lisa.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lissie.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lmorph.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/mismunch.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/rotor.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/sphere.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/spiral.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/t3d.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/vines.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/whirlygig.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/worm.desktop
-%endif
-
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/KBanner.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/KBlob.desktop
 %exclude %{tde_datadir}/applnk/System/ScreenSavers/KClock.desktop
@@ -696,67 +576,22 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %{tde_datadir}/applnk/System/ScreenSavers/*.desktop
 
-##########
-
-%if 0%{?suse_version} && 0%{?opensuse_bs} == 0
-%debug_package
-%endif
-
-##########
-
-%prep
-%autosetup -n %{tarball_name}-%{version}%{?preversion:~%{preversion}}
-
+%prep -a
 # http://www.trinitydesktop.org/wiki/bin/view/Developers/HowToBuild
 # NOTE: Before building tdeartwork, install any and all xhack screensavers that might be uses, then:
 cd tdescreensaver/kxsconfig/
 ./update_hacks.sh
 
 
-%build
+%conf -p
 unset QTDIR QTINC QTLIB
 export PATH="%{tde_bindir}:${PATH}"
 export PKG_CONFIG_PATH="%{tde_libdir}/pkgconfig"
 
-if ! rpm -E %%cmake|grep -e 'cd build\|cd ${CMAKE_BUILD_DIR:-build}'; then
-  %__mkdir_p build
-  cd build
-fi
 
-%cmake \
-  -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
-  -DCMAKE_C_FLAGS="${RPM_OPT_FLAGS}" \
-  -DCMAKE_CXX_FLAGS="${RPM_OPT_FLAGS}" \
-  -DCMAKE_SKIP_RPATH=OFF \
-  -DCMAKE_SKIP_INSTALL_RPATH=OFF \
-  -DCMAKE_INSTALL_RPATH="%{tde_libdir}" \
-  -DCMAKE_VERBOSE_MAKEFILE=ON \
-  -DWITH_GCC_VISIBILITY=OFF \
-  \
-  -DBIN_INSTALL_DIR=%{tde_bindir} \
-  -DINCLUDE_INSTALL_DIR=%{tde_tdeincludedir} \
-  -DLIB_INSTALL_DIR=%{tde_libdir} \
-  -DSHARE_INSTALL_PREFIX=%{tde_datadir} \
-  -DSHARE_INSTALL_PREFIX=%{tde_datadir} \
-  \
-  %{!?with_xscreensaver:-DWITH_XSCREENSAVER=OFF} \
-  %{!?with_libart:-DWITH_LIBART=OFF} \
-  -DWITH_ALL_OPTIONS=ON \
-  -DWITH_ARTS=ON \
-  -DWITH_LIBART=ON \
-  -DWITH_OPENGL=ON \
-  -DBUILD_ALL=ON \
-  ..
-
-%__make %{?_smp_mflags} || %__make
-
-
-%install
-export PATH="%{tde_bindir}:${PATH}"
-%__make install -C build DESTDIR="%{buildroot}"
-
+%install -a
 # Should not be here if xscreensaver is disabled
-%if 0%{?with_xscreensaver} == 0
+%if %{without xscreensaver}
 %__rm -f "%{?buildroot}%{tde_bindir}/xscreensaver-getimage"
 %__rm -f "%{?buildroot}%{tde_bindir}/xscreensaver-getimage-file"
 %endif
@@ -769,7 +604,7 @@ export PATH="%{tde_bindir}:${PATH}"
 %fdupes "%{?buildroot}%{tde_datadir}"
 
 # Fix invalid permissions
-%if 0%{?with_xscreensaver}
+%if %{with xscreensaver}
 chmod +x "%{?buildroot}%{tde_bindir}/xscreensaver-getimage"
 chmod +x "%{?buildroot}%{tde_bindir}/xscreensaver-getimage-file"
 %endif
