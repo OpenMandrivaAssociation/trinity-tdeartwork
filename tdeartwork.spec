@@ -14,21 +14,11 @@
 %if "%{?tde_version}" == ""
 %define tde_version 14.1.5
 %endif
-%define pkg_rel 2
+%define pkg_rel 3
 
 %define tde_pkg tdeartwork
 %define tde_prefix /opt/trinity
-%define tde_bindir %{tde_prefix}/bin
-%define tde_datadir %{tde_prefix}/share
-%define tde_docdir %{tde_datadir}/doc
-%define tde_includedir %{tde_prefix}/include
-%define tde_libdir %{tde_prefix}/%{_lib}
-%define tde_mandir %{tde_datadir}/man
-%define tde_sbindir %{tde_prefix}/sbin
-%define tde_tdeappdir %{tde_datadir}/applications/tde
-%define tde_tdedocdir %{tde_docdir}/tde
-%define tde_tdeincludedir %{tde_includedir}/tde
-%define tde_tdelibdir %{tde_libdir}/trinity
+
 
 %undefine __brp_remove_la_files
 %define dont_remove_libtool_files 1
@@ -49,28 +39,17 @@ URL:		http://www.trinitydesktop.org/
 
 License:	GPLv2+
 
-#Vendor:		Trinity Desktop
-#Packager:	Francois Andriot <francois.andriot@free.fr>
-
-Prefix:		%{tde_prefix}
-
 Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/core/%{tarball_name}-%{version}%{?preversion:~%{preversion}}.tar.xz
 
 BuildSystem:    cmake
-BuildOption:    -DCMAKE_BUILD_TYPE="RelWithDebInfo"
-BuildOption:    -DCMAKE_SKIP_RPATH=OFF
-BuildOption:    -DCMAKE_SKIP_INSTALL_RPATH=OFF
-BuildOption:    -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
-BuildOption:    -DCMAKE_INSTALL_RPATH="%{tde_libdir}"
-BuildOption:    -DBIN_INSTALL_DIR=%{tde_bindir}
-BuildOption:    -DINCLUDE_INSTALL_DIR=%{tde_tdeincludedir}
-BuildOption:    -DLIB_INSTALL_DIR=%{tde_libdir}
-BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_datadir}
-BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_datadir}
+
+BuildOption:    -DCMAKE_INSTALL_PREFIX=%{tde_prefix}
+BuildOption:    -DINCLUDE_INSTALL_DIR=%{tde_prefix}/include/tde
 BuildOption:    -DWITH_ALL_OPTIONS=ON -DWITH_ARTS=ON
-BuildOption:    -DWITH_LIBART=ON -DWITH_OPENGL=ON -DBUILD_ALL=ON
-%{!?with_xscreensaver:BuildOption:    -DWITH_XSCREENSAVER=OFF}
-%{!?with_libart:BuildOption:    -DWITH_LIBART=OFF}
+BuildOption:    -DWITH_OPENGL=ON -DBUILD_ALL=ON
+BuildOption:    -DWITH_GCC_VISIBILITY=%{!?with_clang:ON}%{?with_clang:OFF}
+BuildOption:    -DWITH_XSCREENSAVER=%{!?with_xscreensaver:OFF}%{?with_xscreensaver:ON}
+BuildOption:    -DWITH_LIBART=%{!?with_libart:OFF}%{?with_libart:ON}
 
 Obsoletes:	trinity-kdeartwork < %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:	trinity-kdeartwork = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -162,7 +141,7 @@ This package is part of TDE, and a component of the TDE artwork module.
 
 %files emoticons
 %defattr(-,root,root,-)
-%{tde_datadir}/emoticons/
+%{tde_prefix}/share/emoticons/
 
 ##########
 
@@ -178,9 +157,9 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files misc
 %defattr(-,root,root,-)
-%{tde_datadir}/apps/kworldclock/
-%{tde_datadir}/sounds/KDE_Logout_new.wav
-%{tde_datadir}/sounds/KDE_Startup_new.wav
+%{tde_prefix}/share/apps/kworldclock/
+%{tde_prefix}/share/sounds/KDE_Logout_new.wav
+%{tde_prefix}/share/sounds/KDE_Startup_new.wav
 
 ##########
 
@@ -198,10 +177,10 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files style
 %defattr(-,root,root,-)
-%{tde_tdelibdir}/plugins/styles/
-%{tde_tdelibdir}/tdestyle_phase_config.la
-%{tde_tdelibdir}/tdestyle_phase_config.so
-%{tde_datadir}/apps/tdestyle/
+%{tde_prefix}/%{_lib}/trinity/plugins/styles/
+%{tde_prefix}/%{_lib}/trinity/tdestyle_phase_config.la
+%{tde_prefix}/%{_lib}/trinity/tdestyle_phase_config.so
+%{tde_prefix}/share/apps/tdestyle/
 
 ##########
 
@@ -221,12 +200,12 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files theme-icon
 %defattr(-,root,root,-)
-%{tde_datadir}/icons/ikons/
-%{tde_datadir}/icons/kdeclassic/
-%{tde_datadir}/icons/kids/
-%{tde_datadir}/icons/slick/
-%{tde_datadir}/icons/locolor/index.theme
-%{tde_datadir}/icons/locolor/*/*/*.png
+%{tde_prefix}/share/icons/ikons/
+%{tde_prefix}/share/icons/kdeclassic/
+%{tde_prefix}/share/icons/kids/
+%{tde_prefix}/share/icons/slick/
+%{tde_prefix}/share/icons/locolor/index.theme
+%{tde_prefix}/share/icons/locolor/*/*/*.png
 
 ##########
 
@@ -244,8 +223,8 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files theme-window
 %defattr(-,root,root,-)
-%{tde_tdelibdir}/twin*
-%{tde_datadir}/apps/twin/
+%{tde_prefix}/%{_lib}/trinity/twin*
+%{tde_prefix}/share/apps/twin/
 
 ##########
 
@@ -263,7 +242,7 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files -n trinity-tdewallpapers
 %defattr(-,root,root,-)
-%{tde_datadir}/wallpapers/*
+%{tde_prefix}/share/wallpapers/*
 
 ##########
 
@@ -287,75 +266,75 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files -n trinity-tdescreensaver
 %defattr(-,root,root,-)
-%{tde_bindir}/kslideshow.kss
-%{tde_bindir}/kpolygon.kss
-%{tde_bindir}/krotation.kss
-%{tde_bindir}/ksolarwinds.kss
-%{tde_bindir}/klorenz.kss
-%{tde_bindir}/kvm.kss
-%{tde_bindir}/kflux.kss
-%{tde_bindir}/kscience.kss
-%{tde_bindir}/kbanner.kss
-%{tde_bindir}/kclock.kss
-%{tde_bindir}/kfiresaver.kss
-%{tde_bindir}/keuphoria.kss
-%{tde_bindir}/kfountain.kss
-%{tde_bindir}/kgravity.kss
-%{tde_bindir}/tdepartsaver.kss
-%{tde_bindir}/kpendulum.kss
-%{tde_bindir}/kblob.kss
-%{tde_bindir}/klines.kss
-%{tde_bindir}/kwave.kss
-%{tde_bindir}/tdeasciiquarium.kss
-%{tde_datadir}/applnk/System/ScreenSavers/KBanner.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KBlob.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KClock.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KEuphoria.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KFiresaver.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KFlux.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KFountain.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KGravity.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KLines-saver.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KLorenz.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KPendulum.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KPolygon.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KRotation.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KScience.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KSlideshow.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KSolarWinds.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KVm.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KWave.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/tdepartsaver.desktop
-%{tde_datadir}/apps/kfiresaver/
-%{tde_datadir}/apps/tdescreensaver/
-%{tde_mandir}/man1/kbanner.kss.1*
-%{tde_mandir}/man1/kblob.kss.1*
-%{tde_mandir}/man1/kclock.kss.1*
-%{tde_mandir}/man1/keuphoria.kss.1
-%{tde_mandir}/man1/kfiresaver.kss.1
-%{tde_mandir}/man1/kflux.kss.1
-%{tde_mandir}/man1/kfountain.kss.1
-%{tde_mandir}/man1/kgravity.kss.1
-%{tde_mandir}/man1/klines.kss.1
-%{tde_mandir}/man1/klorenz.kss.1
-%{tde_mandir}/man1/kpendulum.kss.1
-%{tde_mandir}/man1/kpolygon.kss.1
-%{tde_mandir}/man1/krotation.kss.1
-%{tde_mandir}/man1/kscience.kss.1
-%{tde_mandir}/man1/kslideshow.kss.1
-%{tde_mandir}/man1/ksolarwinds.kss.1
-%{tde_mandir}/man1/kvm.kss.1
-%{tde_mandir}/man1/kwave.kss.1
-%{tde_mandir}/man1/tdeasciiquarium.kss.1
-%{tde_mandir}/man1/tdepartsaver.kss.1
+%{tde_prefix}/bin/kslideshow.kss
+%{tde_prefix}/bin/kpolygon.kss
+%{tde_prefix}/bin/krotation.kss
+%{tde_prefix}/bin/ksolarwinds.kss
+%{tde_prefix}/bin/klorenz.kss
+%{tde_prefix}/bin/kvm.kss
+%{tde_prefix}/bin/kflux.kss
+%{tde_prefix}/bin/kscience.kss
+%{tde_prefix}/bin/kbanner.kss
+%{tde_prefix}/bin/kclock.kss
+%{tde_prefix}/bin/kfiresaver.kss
+%{tde_prefix}/bin/keuphoria.kss
+%{tde_prefix}/bin/kfountain.kss
+%{tde_prefix}/bin/kgravity.kss
+%{tde_prefix}/bin/tdepartsaver.kss
+%{tde_prefix}/bin/kpendulum.kss
+%{tde_prefix}/bin/kblob.kss
+%{tde_prefix}/bin/klines.kss
+%{tde_prefix}/bin/kwave.kss
+%{tde_prefix}/bin/tdeasciiquarium.kss
+%{tde_prefix}/share/applnk/System/ScreenSavers/KBanner.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KBlob.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KClock.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KEuphoria.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KFiresaver.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KFlux.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KFountain.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KGravity.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KLines-saver.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KLorenz.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KPendulum.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KPolygon.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KRotation.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KScience.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KSlideshow.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KSolarWinds.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KVm.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KWave.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/tdepartsaver.desktop
+%{tde_prefix}/share/apps/kfiresaver/
+%{tde_prefix}/share/apps/tdescreensaver/
+%{tde_prefix}/share/man/man1/kbanner.kss.1*
+%{tde_prefix}/share/man/man1/kblob.kss.1*
+%{tde_prefix}/share/man/man1/kclock.kss.1*
+%{tde_prefix}/share/man/man1/keuphoria.kss.1
+%{tde_prefix}/share/man/man1/kfiresaver.kss.1
+%{tde_prefix}/share/man/man1/kflux.kss.1
+%{tde_prefix}/share/man/man1/kfountain.kss.1
+%{tde_prefix}/share/man/man1/kgravity.kss.1
+%{tde_prefix}/share/man/man1/klines.kss.1
+%{tde_prefix}/share/man/man1/klorenz.kss.1
+%{tde_prefix}/share/man/man1/kpendulum.kss.1
+%{tde_prefix}/share/man/man1/kpolygon.kss.1
+%{tde_prefix}/share/man/man1/krotation.kss.1
+%{tde_prefix}/share/man/man1/kscience.kss.1
+%{tde_prefix}/share/man/man1/kslideshow.kss.1
+%{tde_prefix}/share/man/man1/ksolarwinds.kss.1
+%{tde_prefix}/share/man/man1/kvm.kss.1
+%{tde_prefix}/share/man/man1/kwave.kss.1
+%{tde_prefix}/share/man/man1/tdeasciiquarium.kss.1
+%{tde_prefix}/share/man/man1/tdepartsaver.kss.1
 
 %if %{with xscreensaver}
-%{tde_bindir}/kspace.kss
-%{tde_bindir}/kswarm.kss
-%{tde_datadir}/applnk/System/ScreenSavers/KSpace.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/KSwarm.desktop
-%{tde_mandir}/man1/kspace.kss.1
-%{tde_mandir}/man1/kswarm.kss.1
+%{tde_prefix}/bin/kspace.kss
+%{tde_prefix}/bin/kswarm.kss
+%{tde_prefix}/share/applnk/System/ScreenSavers/KSpace.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/KSwarm.desktop
+%{tde_prefix}/share/man/man1/kspace.kss.1
+%{tde_prefix}/share/man/man1/kswarm.kss.1
 %endif
 
 ##########
@@ -387,77 +366,77 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files -n trinity-tdescreensaver-xsavers
 %defattr(-,root,root,-)
-%{tde_bindir}/xscreensaver-getimage-file
-%{tde_bindir}/xscreensaver-getimage
-%{tde_bindir}/kxsconfig
-%{tde_bindir}/kxsrun
-%{tde_datadir}/applnk/System/ScreenSavers/antinspect.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/antspotlight.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/atunnel.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/blinkbox.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/braid.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/bubble3d.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/circuit.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/cubestorm.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/deco.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/distort.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/endgame.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/engine.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/fiberlamp.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/flipflop.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/flipscreen3d.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/flyingtoasters.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/fuzzyflakes.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/galaxy.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/gears.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/gflux.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glblur.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/gleidescope.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glknots.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glslideshow.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glsnake.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/gltext.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/hypertorus.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/jigglypuff.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lavalite.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/metaballs.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/mirrorblob.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/moebius.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/molecule.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/morph3d.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/penrose.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/pipes.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/polyhedra.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/polytopes.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/popsquares.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/pulsar.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/queens.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/ripples.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/shadebobs.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/sierpinski3d.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/slidescreen.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/sonar.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/spheremonics.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/stonerview.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/superquadrics.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/swirl.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/xlyap.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/m6502.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glschool.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/moebiusgears.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/glcells.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/abstractile.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lockward.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/cwaves.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/topblock.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/voronoi.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/cubicgrid.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/hypnowheel.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/lcdscrub.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/photopile.desktop
-%{tde_datadir}/applnk/System/ScreenSavers/skytentacles.desktop
-%{tde_mandir}/man1/kxsconfig.1
-%{tde_mandir}/man1/kxsrun.1
+%{tde_prefix}/bin/xscreensaver-getimage-file
+%{tde_prefix}/bin/xscreensaver-getimage
+%{tde_prefix}/bin/kxsconfig
+%{tde_prefix}/bin/kxsrun
+%{tde_prefix}/share/applnk/System/ScreenSavers/antinspect.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/antspotlight.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/atunnel.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/blinkbox.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/braid.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/bubble3d.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/circuit.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/cubestorm.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/deco.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/distort.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/endgame.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/engine.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/fiberlamp.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/flipflop.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/flipscreen3d.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/flyingtoasters.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/fuzzyflakes.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/galaxy.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/gears.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/gflux.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glblur.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/gleidescope.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glknots.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glslideshow.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glsnake.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/gltext.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/hypertorus.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/jigglypuff.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/lavalite.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/metaballs.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/mirrorblob.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/moebius.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/molecule.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/morph3d.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/penrose.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/pipes.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/polyhedra.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/polytopes.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/popsquares.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/pulsar.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/queens.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/ripples.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/shadebobs.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/sierpinski3d.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/slidescreen.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/sonar.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/spheremonics.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/stonerview.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/superquadrics.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/swirl.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/xlyap.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/m6502.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glschool.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/moebiusgears.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/glcells.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/abstractile.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/lockward.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/cwaves.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/topblock.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/voronoi.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/cubicgrid.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/hypnowheel.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/lcdscrub.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/photopile.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/skytentacles.desktop
+%{tde_prefix}/share/man/man1/kxsconfig.1
+%{tde_prefix}/share/man/man1/kxsrun.1
 
 %endif
 
@@ -485,96 +464,96 @@ This package is part of Trinity, and a component of the TDE artwork module.
 
 %files -n trinity-tdescreensaver-xsavers-extra
 %defattr(-,root,root,-)
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/webcollage.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/antinspect.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/antspotlight.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/atunnel.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/blinkbox.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/braid.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/bubble3d.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/circuit.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/cubestorm.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/deco.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/distort.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/endgame.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/engine.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/fiberlamp.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/flipflop.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/flipscreen3d.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/flyingtoasters.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/fuzzyflakes.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/galaxy.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/gears.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/gflux.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glblur.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/gleidescope.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glknots.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glslideshow.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glsnake.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/gltext.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/hypertorus.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/jigglypuff.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lavalite.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/metaballs.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/mirrorblob.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/moebius.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/molecule.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/morph3d.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/penrose.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/pipes.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/polyhedra.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/polytopes.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/popsquares.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/pulsar.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/queens.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/ripples.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/shadebobs.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/sierpinski3d.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/slidescreen.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/sonar.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/spheremonics.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/stonerview.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/superquadrics.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/swirl.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/xlyap.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/m6502.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glschool.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/moebiusgears.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/glcells.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/abstractile.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lockward.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/cwaves.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/topblock.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/voronoi.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/cubicgrid.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/hypnowheel.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/lcdscrub.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/photopile.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/skytentacles.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KBanner.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KBlob.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KClock.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KEuphoria.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KFiresaver.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KFlux.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KFountain.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KGravity.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KLines-saver.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KLorenz.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KPendulum.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KPolygon.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KRotation.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KScience.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KSlideshow.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KSolarWinds.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KVm.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KWave.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/tdepartsaver.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/webcollage.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/antinspect.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/antspotlight.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/atunnel.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/blinkbox.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/braid.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/bubble3d.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/circuit.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/cubestorm.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/deco.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/distort.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/endgame.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/engine.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/fiberlamp.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/flipflop.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/flipscreen3d.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/flyingtoasters.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/fuzzyflakes.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/galaxy.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/gears.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/gflux.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glblur.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/gleidescope.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glknots.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glslideshow.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glsnake.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/gltext.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/hypertorus.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/jigglypuff.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/lavalite.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/metaballs.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/mirrorblob.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/moebius.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/molecule.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/morph3d.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/penrose.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/pipes.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/polyhedra.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/polytopes.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/popsquares.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/pulsar.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/queens.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/ripples.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/shadebobs.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/sierpinski3d.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/slidescreen.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/sonar.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/spheremonics.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/stonerview.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/superquadrics.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/swirl.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/xlyap.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/m6502.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glschool.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/moebiusgears.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/glcells.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/abstractile.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/lockward.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/cwaves.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/topblock.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/voronoi.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/cubicgrid.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/hypnowheel.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/lcdscrub.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/photopile.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/skytentacles.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KBanner.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KBlob.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KClock.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KEuphoria.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KFiresaver.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KFlux.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KFountain.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KGravity.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KLines-saver.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KLorenz.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KPendulum.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KPolygon.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KRotation.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KScience.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KSlideshow.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KSolarWinds.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KVm.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KWave.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/tdepartsaver.desktop
 
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KSpace.desktop
-%exclude %{tde_datadir}/applnk/System/ScreenSavers/KSwarm.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KSpace.desktop
+%exclude %{tde_prefix}/share/applnk/System/ScreenSavers/KSwarm.desktop
 
-%{tde_datadir}/applnk/System/ScreenSavers/*.desktop
+%{tde_prefix}/share/applnk/System/ScreenSavers/*.desktop
 
 %prep -a
 # http://www.trinitydesktop.org/wiki/bin/view/Developers/HowToBuild
@@ -585,27 +564,27 @@ cd tdescreensaver/kxsconfig/
 
 %conf -p
 unset QTDIR QTINC QTLIB
-export PATH="%{tde_bindir}:${PATH}"
-export PKG_CONFIG_PATH="%{tde_libdir}/pkgconfig"
+export PATH="%{tde_prefix}/bin:${PATH}"
+export PKG_CONFIG_PATH="%{tde_prefix}/%{_lib}/pkgconfig"
 
 
 %install -a
 # Should not be here if xscreensaver is disabled
 %if %{without xscreensaver}
-%__rm -f "%{?buildroot}%{tde_bindir}/xscreensaver-getimage"
-%__rm -f "%{?buildroot}%{tde_bindir}/xscreensaver-getimage-file"
+%__rm -f "%{?buildroot}%{tde_prefix}/bin/xscreensaver-getimage"
+%__rm -f "%{?buildroot}%{tde_prefix}/bin/xscreensaver-getimage-file"
 %endif
 
 # Duplicate with trinity-kbabel (from tdesdk)
-%__rm -f "%{?buildroot}%{tde_datadir}/icons/locolor/16x16/apps/kbabel.png"
-%__rm -f "%{?buildroot}%{tde_datadir}/icons/locolor/32x32/apps/kbabel.png"
+%__rm -f "%{?buildroot}%{tde_prefix}/share/icons/locolor/16x16/apps/kbabel.png"
+%__rm -f "%{?buildroot}%{tde_prefix}/share/icons/locolor/32x32/apps/kbabel.png"
 
 # Links duplicate files
-%fdupes "%{?buildroot}%{tde_datadir}"
+%fdupes "%{?buildroot}%{tde_prefix}/share"
 
 # Fix invalid permissions
 %if %{with xscreensaver}
-chmod +x "%{?buildroot}%{tde_bindir}/xscreensaver-getimage"
-chmod +x "%{?buildroot}%{tde_bindir}/xscreensaver-getimage-file"
+chmod +x "%{?buildroot}%{tde_prefix}/bin/xscreensaver-getimage"
+chmod +x "%{?buildroot}%{tde_prefix}/bin/xscreensaver-getimage-file"
 %endif
 
