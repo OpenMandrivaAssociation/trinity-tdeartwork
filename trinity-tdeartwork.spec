@@ -10,11 +10,9 @@
 #  Having KDE libraries may cause FTBFS here !
 
 # TDE variables
-%define tde_epoch 2
-%if "%{?tde_version}" == ""
-%define tde_version 14.1.5
+%if "%{?version}" == ""
+%define version 14.1.5
 %endif
-%define pkg_rel 3
 
 %define tde_pkg tdeartwork
 %define tde_prefix /opt/trinity
@@ -32,14 +30,14 @@
 
 Name:		trinity-%{tde_pkg}
 Summary:	Additional artwork (themes, sound themes, ...) for TDE
-Version:	%{tde_version}
-Release:	%{?!preversion:%{pkg_rel}}%{?preversion:0_%{preversion}}%{?dist}
+Version:	14.1.5
+Release:	4
 Group:		System/GUI/Other
 URL:		http://www.trinitydesktop.org/
 
 License:	GPLv2+
 
-Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/core/%{tarball_name}-%{version}%{?preversion:~%{preversion}}.tar.xz
+Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{version}/main/core/%{tarball_name}-%{version}%{?preversion:~%{preversion}}.tar.xz
 
 BuildSystem:    cmake
 
@@ -51,14 +49,14 @@ BuildOption:    -DWITH_GCC_VISIBILITY=%{!?with_clang:ON}%{?with_clang:OFF}
 BuildOption:    -DWITH_XSCREENSAVER=%{!?with_xscreensaver:OFF}%{?with_xscreensaver:ON}
 BuildOption:    -DWITH_LIBART=%{!?with_libart:OFF}%{?with_libart:ON}
 
-Obsoletes:	trinity-kdeartwork < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kdeartwork = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kdeartwork < %{EVRD}
+Provides:	trinity-kdeartwork = %{EVRD}
 
-BuildRequires:	trinity-arts-devel >= %{tde_epoch}:1.5.10
-BuildRequires:	trinity-tdelibs-devel >= %{tde_version}
-BuildRequires:	trinity-tdebase-devel >= %{tde_version}
+BuildRequires:	trinity-arts-devel >= 1.5.10
+BuildRequires:	trinity-tdelibs-devel >= %{version}
+BuildRequires:	trinity-tdebase-devel >= %{version}
 
-BuildRequires:	trinity-tde-cmake >= %{tde_version}
+BuildRequires:	trinity-tde-cmake >= %{version}
 
 %{!?with_clang:BuildRequires:	gcc-c++}
 
@@ -100,17 +98,17 @@ BuildRequires:	pkgconfig(openssl)
 
 
 # Metapackage
-Requires: %{name}-emoticons = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: %{name}-misc = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: %{name}-style = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: %{name}-theme-icon = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: %{name}-theme-window = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: trinity-tdewallpapers = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: trinity-tdescreensaver = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires: %{name}-emoticons = %{EVRD}
+Requires: %{name}-misc = %{EVRD}
+Requires: %{name}-style = %{EVRD}
+Requires: %{name}-theme-icon = %{EVRD}
+Requires: %{name}-theme-window = %{EVRD}
+Requires: trinity-tdewallpapers = %{EVRD}
+Requires: trinity-tdescreensaver = %{EVRD}
 
 %if %{with xscreensaver}
-Requires: trinity-tdescreensaver-xsavers = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires: trinity-tdescreensaver-xsavers-extra = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires: trinity-tdescreensaver-xsavers = %{EVRD}
+Requires: trinity-tdescreensaver-xsavers-extra = %{EVRD}
 %endif
 
 
@@ -188,8 +186,8 @@ This package is part of Trinity, and a component of the TDE artwork module.
 Summary:	Icon themes released with Trinity
 Group:		System/GUI/Other
 
-Obsoletes:	trinity-kdeartwork-icons < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kdeartwork-icons = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kdeartwork-icons < %{EVRD}
+Provides:	trinity-kdeartwork-icons = %{EVRD}
 
 %description theme-icon
 This package contains additional icon themes for Trinity. Icon themes can be
@@ -231,8 +229,8 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %package -n trinity-tdewallpapers
 Summary:	Wallpapers released with Trinity
 Group:		System/GUI/Other
-Obsoletes:	trinity-kdewallpapers < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kdewallpapers = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kdewallpapers < %{EVRD}
+Provides:	trinity-kdewallpapers = %{EVRD}
 
 %description -n trinity-tdewallpapers
 This package contains additional wallpapers for Trinity. Wallpapers can be
@@ -250,8 +248,8 @@ This package is part of Trinity, and a component of the TDE artwork module.
 Summary:	Additional screen savers released with Trinity
 Group:		System/GUI/Other
 
-Obsoletes:	trinity-kscreensaver < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kscreensaver = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kscreensaver < %{EVRD}
+Provides:	trinity-kscreensaver = %{EVRD}
 
 %description -n trinity-tdescreensaver
 This package contains the screen savers for Trinity. They can be tested and
@@ -344,11 +342,11 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %package -n trinity-tdescreensaver-xsavers
 Summary:	Trinity hooks for standard xscreensavers
 Group:		System/GUI/Other
-Requires:	trinity-tdebase-bin >= %{tde_version}
+Requires:	trinity-tdebase-bin >= %{version}
 Requires:	xscreensaver
 
-Obsoletes:	trinity-kscreensaver-xsavers < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kscreensaver-xsavers = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kscreensaver-xsavers < %{EVRD}
+Provides:	trinity-kscreensaver-xsavers = %{EVRD}
 
 %description -n trinity-tdescreensaver-xsavers
 This package allows a smooth integration of the standard xscreensavers
@@ -445,10 +443,10 @@ This package is part of Trinity, and a component of the TDE artwork module.
 %package -n trinity-tdescreensaver-xsavers-extra
 Summary:	Trinity hooks for standard xscreensavers
 Group:		System/GUI/Other
-Requires:	trinity-tdescreensaver-xsavers = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:	trinity-tdescreensaver-xsavers = %{EVRD}
 
-Obsoletes:	trinity-kscreensaver-xsavers-extra < %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:	trinity-kscreensaver-xsavers-extra = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:	trinity-kscreensaver-xsavers-extra < %{EVRD}
+Provides:	trinity-kscreensaver-xsavers-extra = %{EVRD}
 
 %description -n trinity-tdescreensaver-xsavers-extra
 This package allows a smooth integration of the universe xscreensavers
