@@ -10,10 +10,6 @@
 #  Having KDE libraries may cause FTBFS here !
 
 # TDE variables
-%if "%{?version}" == ""
-%define version 14.1.5
-%endif
-
 %define tde_pkg tdeartwork
 %define tde_prefix /opt/trinity
 
@@ -23,15 +19,15 @@
 %define _disable_rebuild_configure 1
 
 # fixes error: Empty %files file …/debugsourcefiles.list
-%define _debugsource_template %{nil}
+%undefine _debugsource_template
 
 %define tarball_name %{tde_pkg}-trinity
 
 
 Name:		trinity-%{tde_pkg}
 Summary:	Additional artwork (themes, sound themes, ...) for TDE
-Version:	14.1.5
-Release:	4
+Version:	14.1.6
+Release:	1
 Group:		System/GUI/Other
 URL:		http://www.trinitydesktop.org/
 
@@ -52,7 +48,7 @@ BuildOption:    -DWITH_LIBART=%{!?with_libart:OFF}%{?with_libart:ON}
 Obsoletes:	trinity-kdeartwork < %{EVRD}
 Provides:	trinity-kdeartwork = %{EVRD}
 
-BuildRequires:	trinity-arts-devel >= 1.5.10
+BuildRequires:	trinity-arts-devel >= %{version}
 BuildRequires:	trinity-tdelibs-devel >= %{version}
 BuildRequires:	trinity-tdebase-devel >= %{version}
 
